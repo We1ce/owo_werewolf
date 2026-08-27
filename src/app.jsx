@@ -1,4 +1,4 @@
-export default function App() { ... }
+export default function App() {
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Sun, Moon, Plus, Trash2, GripVertical, UserPlus, Save } from 'lucide-react';
@@ -311,4 +311,4 @@ const DraggableList = ({ items, onDragEnd, onAdd, onRemove, color, playerId, typ
   );
 };
 
-export default WerewolfTracker;
+export default WerewolfTracker;}
