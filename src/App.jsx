@@ -1,8 +1,9 @@
-export default function App() {
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Sun, Moon, Plus, Trash2, GripVertical, UserPlus, Save } from 'lucide-react';
 
+
+export default function App() {
 // --- 初始資料設定 ---
 const DEFAULT_ROLES = {
   good: ['預言家', '女巫', '獵人', '守衛', '平民'],
@@ -311,4 +312,5 @@ const DraggableList = ({ items, onDragEnd, onAdd, onRemove, color, playerId, typ
   );
 };
 
-export default WerewolfTracker;}
+export default WerewolfTracker;
+}
