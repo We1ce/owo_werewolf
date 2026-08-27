@@ -1,3 +1,4 @@
+xport default function App()
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Sun, Moon, Plus, Trash2, GripVertical, UserPlus, Save } from 'lucide-react';
