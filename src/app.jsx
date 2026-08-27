@@ -1,0 +1,314 @@
+export default function App() { ... }
+import React, { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Sun, Moon, Plus, Trash2, GripVertical, UserPlus, Save } from 'lucide-react';
+
+// --- 初始資料設定 ---
+const DEFAULT_ROLES = {
+  good: ['預言家', '女巫', '獵人', '守衛', '平民'],
+  evil: ['小狼', '狼王', '機械狼', '白狼王', '黑狼王', '大灰狼']
+};
+
+const DEATH_METHODS = ['存活', '刀殺', '毒殺', '票死', '帶走', '自爆', '彈死'];
+
+const WerewolfTracker = () => {
+  // --- 狀態管理 ---
+  const [theme, setTheme] = useState('night'); // 'day' | 'night'
+  const [modes, setModes] = useState([
+    { name: '標準 12 人局', roles: { '預言家': 1, '女巫': 1, '獵人': 1, '守衛': 1, '平民': 4, '小狼': 4 } }
+  ]);
+  const [currentModeIdx, setCurrentModeIdx] = useState(0);
+  const [players, setPlayers] = useState([]);
+  const [customRoleName, setCustomRoleName] = useState('');
+  const [isSettingMode, setIsSettingMode] = useState(false);
+
+  // 初始化玩家資料
+  useEffect(() => {
+    const initialPlayers = Array.from({ length: 12 }, (_, i) => ({
+      id: `player-${i + 1}`,
+      no: i + 1,
+      role: '',
+      death: '存活',
+      side: '',
+      goodList: [], // 存放玩家號碼
+      wolfList: []  // 存放玩家號碼
+    }));
+    setPlayers(initialPlayers);
+  }, []);
+
+  // --- 邏輯處理 ---
+  const toggleTheme = () => setTheme(theme === 'day' ? 'night' : 'day');
+
+  const addPlayer = () => {
+    const newNo = players.length + 1;
+    setPlayers([...players, {
+      id: `player-${newNo}`,
+      no: newNo,
+      role: '',
+      death: '存活',
+      side: '',
+      goodList: [],
+      wolfList: []
+    }]);
+  };
+
+  const updatePlayer = (index, field, value) => {
+    const newPlayers = [...players];
+    newPlayers[index][field] = value;
+    setPlayers(newPlayers);
+  };
+
+  // 處理列表標籤的新增 (好人坑/狼坑)
+  const addToList = (index, field, value) => {
+    if (!value || players[index][field].includes(value)) return;
+    const newPlayers = [...players];
+    newPlayers[index][field].push(value);
+    setPlayers(newPlayers);
+  };
+
+  // 處理拖拽排序
+  const onDragEnd = (result, playerIdx, field) => {
+    if (!result.destination) return;
+    const newPlayers = [...players];
+    const list = Array.from(newPlayers[playerIdx][field]);
+    const [reorderedItem] = list.splice(result.source.index, 1);
+    list.splice(result.destination.index, 0, reorderedItem);
+    newPlayers[playerIdx][field] = list;
+    setPlayers(newPlayers);
+  };
+
+  const removeFromList = (playerIdx, field, itemIdx) => {
+    const newPlayers = [...players];
+    newPlayers[playerIdx][field].splice(itemIdx, 1);
+    setPlayers(newPlayers);
+  };
+
+  // --- 樣式設定 ---
+  const themeClass = theme === 'day' 
+    ? 'bg-slate-50 text-slate-900' 
+    : 'bg-slate-900 text-slate-100';
+  
+  const cardClass = theme === 'day'
+    ? 'bg-white border-slate-200 shadow-sm'
+    : 'bg-slate-800 border-slate-700 shadow-lg';
+
+  const inputClass = theme === 'day'
+    ? 'bg-slate-100 border-slate-300'
+    : 'bg-slate-700 border-slate-600';
+
+  return (
+    <div className={`min-h-screen p-4 transition-colors duration-300 ${themeClass}`}>
+      {/* Header */}
+      <div className="max-w-7xl mx-auto flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          🐺 凹嗚狼人殺筆記本
+          <span className="text-sm font-normal px-2 py-1 rounded bg-orange-500 text-white">娛樂百分百版</span>
+        </h1>
+        <div className="flex gap-4">
+          <button onClick={() => setIsSettingMode(!isSettingMode)} className="flex items-center gap-1 px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700">
+            {isSettingMode ? '返回記錄' : '設定模式'}
+          </button>
+          <button onClick={toggleTheme} className="p-2 rounded-full bg-opacity-20 bg-gray-500">
+            {theme === 'day' ? <Moon size={24} /> : <Sun size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {isSettingMode ? (
+        /* 設定模式介面 */
+        <div className={`max-w-4xl mx-auto p-6 rounded-xl ${cardClass} border`}>
+          <h2 className="text-xl mb-4">模式與身分自訂</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="font-bold mb-2">現有身分池</h3>
+              <div className="flex flex-wrap gap-2">
+                {[...DEFAULT_ROLES.good, ...DEFAULT_ROLES.evil].map(r => (
+                  <span key={r} className="px-3 py-1 bg-gray-500 bg-opacity-20 rounded-full">{r}</span>
+                ))}
+              </div>
+              <div className="mt-4 flex gap-2">
+                <input 
+                  type="text" 
+                  value={customRoleName} 
+                  onChange={(e) => setCustomRoleName(e.target.value)}
+                  placeholder="新增自訂身分"
+                  className={`flex-1 p-2 rounded ${inputClass}`}
+                />
+                <button 
+                  onClick={() => {
+                    if(customRoleName) {
+                        DEFAULT_ROLES.good.push(customRoleName);
+                        setCustomRoleName('');
+                    }
+                  }}
+                  className="p-2 bg-green-600 rounded text-white"><Plus size={20}/></button>
+              </div>
+            </div>
+            <div>
+              <h3 className="font-bold mb-2">模式預設 (功能開發中)</h3>
+              <p className="text-sm opacity-60">此處可擴充設置各身分數量，目前紀錄頁面支援所有身分選擇。</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* 主遊戲紀錄介面 */
+        <div className="max-w-full overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="text-left border-b border-slate-500 opacity-70">
+                <th className="p-3 w-16">號碼</th>
+                <th className="p-3 w-32">身分</th>
+                <th className="p-3 w-32">狀態</th>
+                <th className="p-3 w-20">站邊</th>
+                <th className="p-3 min-w-[200px]">好人坑 (可拖拽排序)</th>
+                <th className="p-3 min-w-[200px]">狼坑 (可拖拽排序)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {players.map((p, idx) => (
+                <tr key={p.id} className={`border-b ${theme === 'day' ? 'border-slate-200' : 'border-slate-800'}`}>
+                  <td className="p-3 font-bold text-center">
+                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                      {p.no}
+                    </div>
+                  </td>
+                  
+                  {/* 身分 */}
+                  <td className="p-3">
+                    <select 
+                      value={p.role} 
+                      onChange={(e) => updatePlayer(idx, 'role', e.target.value)}
+                      className={`w-full p-2 rounded ${inputClass}`}
+                    >
+                      <option value="">未知</option>
+                      <optgroup label="好人陣營">
+                        {DEFAULT_ROLES.good.map(r => <option key={r} value={r}>{r}</option>)}
+                      </optgroup>
+                      <optgroup label="邪惡陣營">
+                        {DEFAULT_ROLES.evil.map(r => <option key={r} value={r}>{r}</option>)}
+                      </optgroup>
+                    </select>
+                  </td>
+
+                  {/* 死亡方式 */}
+                  <td className="p-3">
+                    <select 
+                      value={p.death} 
+                      onChange={(e) => updatePlayer(idx, 'death', e.target.value)}
+                      className={`w-full p-2 rounded ${inputClass} ${p.death !== '存活' ? 'text-red-500' : ''}`}
+                    >
+                      {DEATH_METHODS.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                  </td>
+
+                  {/* 站邊 */}
+                  <td className="p-3">
+                    <input 
+                      type="number" 
+                      placeholder="號"
+                      value={p.side}
+                      onChange={(e) => updatePlayer(idx, 'side', e.target.value)}
+                      className={`w-full p-2 rounded ${inputClass}`}
+                    />
+                  </td>
+
+                  {/* 好人/狼坑 (Draggable) */}
+                  <td className="p-3">
+                    <DraggableList 
+                      items={p.goodList} 
+                      onDragEnd={(res) => onDragEnd(res, idx, 'goodList')}
+                      onAdd={(val) => addToList(idx, 'goodList', val)}
+                      onRemove={(itemIdx) => removeFromList(idx, 'goodList', itemIdx)}
+                      color="bg-green-600"
+                      playerId={p.id}
+                      type="good"
+                      theme={theme}
+                    />
+                  </td>
+                  <td className="p-3">
+                    <DraggableList 
+                      items={p.wolfList} 
+                      onDragEnd={(res) => onDragEnd(res, idx, 'wolfList')}
+                      onAdd={(val) => addToList(idx, 'wolfList', val)}
+                      onRemove={(itemIdx) => removeFromList(idx, 'wolfList', itemIdx)}
+                      color="bg-red-600"
+                      playerId={p.id}
+                      type="wolf"
+                      theme={theme}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button 
+            onClick={addPlayer}
+            className="mt-6 flex items-center gap-2 px-6 py-3 bg-gray-500 bg-opacity-20 rounded-xl hover:bg-opacity-30 transition-all"
+          >
+            <UserPlus size={20}/> 新增玩家行數
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// --- 子組件：可排序標籤列表 ---
+const DraggableList = ({ items, onDragEnd, onAdd, onRemove, color, playerId, type, theme }) => {
+  const [input, setInput] = useState('');
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-1">
+        <input 
+          type="number" 
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if(e.key === 'Enter') {
+              onAdd(input);
+              setInput('');
+            }
+          }}
+          placeholder="加號碼"
+          className={`w-16 text-sm p-1 rounded ${theme === 'day' ? 'bg-slate-200' : 'bg-slate-700'}`}
+        />
+        <button onClick={() => { onAdd(input); setInput(''); }} className="p-1 text-blue-500"><Plus size={16}/></button>
+      </div>
+
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId={`${playerId}-${type}`} direction="horizontal">
+          {(provided) => (
+            <div 
+              {...provided.droppableProps} 
+              ref={provided.innerRef}
+              className="flex flex-wrap gap-1 min-h-[30px]"
+            >
+              {items.map((item, index) => (
+                <Draggable key={`${playerId}-${type}-${item}`} draggableId={`${playerId}-${type}-${item}`} index={index}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className={`flex items-center gap-1 px-2 py-1 rounded text-white text-xs ${color}`}
+                    >
+                      <GripVertical size={10} />
+                      <span>{item}</span>
+                      <button onClick={() => onRemove(index)} className="hover:text-black">
+                        <Trash2 size={10} />
+                      </button>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </div>
+  );
+};
+
+export default WerewolfTracker;
