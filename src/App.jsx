@@ -150,7 +150,7 @@ export default function App() {
           <h1 className="text-3xl font-black tracking-tighter bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
             狼人殺紀錄
           </h1>
-          <p className="text-xs opacity-50 font-medium">LU-LA-LA WEREWOLF TRACKER</p>
+          <p className="text-xs opacity-50 font-medium">WOLF TRACKER</p>
         </div>
         <div className="flex gap-3">
           <button 
