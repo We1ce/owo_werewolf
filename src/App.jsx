@@ -21,13 +21,13 @@ export default function App() {
   const [newEvilRole, setNewEvilRole] = useState('');
   const [modeName, setModeName] = useState('');
   const [savedModes, setSavedModes] = useState([]);
-  const [activeModeName, setActiveModeName] = useState(null); // 紀錄目前啟動的模式名稱
+  const [activeModeName, setActiveModeName] = useState(null);
 
   // 數字選擇器
   const [activePicker, setActivePicker] = useState(null);
 
   useEffect(() => {
-    const localModes = localStorage.getItem('ww_modes_v4');
+    const localModes = localStorage.getItem('ww_modes_v5');
     if (localModes) setSavedModes(JSON.parse(localModes));
     resetGame();
   }, []);
@@ -97,7 +97,7 @@ export default function App() {
       {/* Header */}
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-black tracking-tighter bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent italic">狼人殺紀錄</h1>
+          <h1 className="text-3xl font-black tracking-tighter bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">狼人殺紀錄</h1>
           <p className="text-[10px] font-bold opacity-30 tracking-[0.3em]">WOLF TRACKER PRO</p>
         </div>
 
@@ -118,40 +118,39 @@ export default function App() {
       </div>
 
       {isSettingMode ? (
-        /* 模式設定介面 */
         <div className="max-w-5xl mx-auto space-y-10 animate-in fade-in zoom-in duration-300">
           <div className={`${themeClasses.card} p-8 md:p-12 rounded-[3rem] shadow-2xl border ${themeClasses.border}`}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               {/* 好人陣營 */}
               <section>
-                <h3 className="text-blue-500 font-black text-xl mb-6 flex items-center gap-2 italic">● 好人陣營</h3>
+                <h3 className="text-blue-500 font-black text-xl mb-6 flex items-center gap-2">● 好人陣營</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {goodRoles.map(r => (
-                    <div key={r} className={`${themeClasses.input} p-5 rounded-3xl flex flex-col items-center border border-transparent focus-within:border-blue-500 transition-all`}>
+                    <div key={r} className={`${themeClasses.input} p-5 rounded-3xl flex flex-col items-center border border-transparent focus-within:border-blue-500 transition-all shadow-sm`}>
                       <span className="text-xl font-black mb-1">{r}</span>
                       <input type="number" value={roleCounts[r]||''} onChange={e=>setRoleCounts({...roleCounts,[r]:e.target.value})} className="bg-transparent text-center font-black text-2xl w-full outline-none text-blue-500" placeholder="0"/>
                     </div>
                   ))}
                   <div className="p-4 border-2 border-dashed border-blue-500/30 rounded-3xl flex flex-col gap-2 justify-center">
                     <input type="text" placeholder="自訂好人" value={newGoodRole} onChange={e=>setNewGoodRole(e.target.value)} className="bg-transparent text-center text-sm font-black outline-none"/>
-                    <button onClick={()=>{if(newGoodRole){setGoodRoles([...goodRoles,newGoodRole]);setNewGoodRole('')}}} className="bg-blue-600 text-white text-xs py-2 rounded-xl font-black">＋ 新增</button>
+                    <button onClick={()=>{if(newGoodRole){setGoodRoles([...goodRoles,newGoodRole]);setNewGoodRole('')}}} className="bg-blue-600 text-white text-xs py-2 rounded-xl font-black">＋ 新增身分</button>
                   </div>
                 </div>
               </section>
 
               {/* 壞人陣營 */}
               <section>
-                <h3 className="text-rose-500 font-black text-xl mb-6 flex items-center gap-2 italic">● 邪惡陣營</h3>
+                <h3 className="text-rose-500 font-black text-xl mb-6 flex items-center gap-2">● 邪惡陣營</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {evilRoles.map(r => (
-                    <div key={r} className={`${themeClasses.input} p-5 rounded-3xl flex flex-col items-center border border-transparent focus-within:border-rose-500 transition-all`}>
+                    <div key={r} className={`${themeClasses.input} p-5 rounded-3xl flex flex-col items-center border border-transparent focus-within:border-rose-500 transition-all shadow-sm`}>
                       <span className="text-xl font-black mb-1">{r}</span>
                       <input type="number" value={roleCounts[r]||''} onChange={e=>setRoleCounts({...roleCounts,[r]:e.target.value})} className="bg-transparent text-center font-black text-2xl w-full outline-none text-rose-500" placeholder="0"/>
                     </div>
                   ))}
                   <div className="p-4 border-2 border-dashed border-rose-500/30 rounded-3xl flex flex-col gap-2 justify-center">
                     <input type="text" placeholder="自訂壞人" value={newEvilRole} onChange={e=>setNewEvilRole(e.target.value)} className="bg-transparent text-center text-sm font-black outline-none"/>
-                    <button onClick={()=>{if(newEvilRole){setEvilRoles([...evilRoles,newEvilRole]);setNewEvilRole('')}}} className="bg-rose-600 text-white text-xs py-2 rounded-xl font-black">＋ 新增</button>
+                    <button onClick={()=>{if(newEvilRole){setEvilRoles([...evilRoles,newEvilRole]);setNewEvilRole('')}}} className="bg-rose-600 text-white text-xs py-2 rounded-xl font-black">＋ 新增身分</button>
                   </div>
                 </div>
               </section>
@@ -164,7 +163,7 @@ export default function App() {
                 const newMode = { name: modeName, counts: {...roleCounts} };
                 const updated = [...savedModes, newMode];
                 setSavedModes(updated);
-                localStorage.setItem('ww_modes_v4', JSON.stringify(updated));
+                localStorage.setItem('ww_modes_v5', JSON.stringify(updated));
                 setModeName('');
                 setActiveModeName(newMode.name);
               }} className="px-10 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-3xl font-black shadow-xl hover:scale-105 transition-all">儲存模式配置</button>
@@ -181,9 +180,9 @@ export default function App() {
                 {activeModeName === m.name && <Star className="absolute top-4 right-4 fill-white" size={16} />}
                 <h4 className="font-black text-xl mb-1 truncate pr-6">{m.name}</h4>
                 <p className={`text-[10px] font-black uppercase tracking-widest ${activeModeName === m.name ? 'text-blue-100' : 'text-blue-500'}`}>
-                  {activeModeName === m.name ? 'Currently Active' : 'Click to Apply'}
+                  {activeModeName === m.name ? '目前選擇模式' : '點擊切換模式'}
                 </p>
-                <button onClick={(e)=>{e.stopPropagation(); const u=savedModes.filter((_,idx)=>idx!==i);setSavedModes(u);localStorage.setItem('ww_modes_v4',JSON.stringify(u)); if(activeModeName===m.name) setActiveModeName(null)}} className="absolute bottom-4 right-4 p-2 text-rose-500 hover:bg-rose-500 hover:text-white rounded-full transition-all">
+                <button onClick={(e)=>{e.stopPropagation(); const u=savedModes.filter((_,idx)=>idx!==i);setSavedModes(u);localStorage.setItem('ww_modes_v5',JSON.stringify(u)); if(activeModeName===m.name) setActiveModeName(null)}} className="absolute bottom-4 right-4 p-2 text-rose-500 hover:bg-rose-500 hover:text-white rounded-full transition-all">
                   <Trash2 size={16}/>
                 </button>
               </div>
@@ -194,9 +193,9 @@ export default function App() {
         /* 主遊戲紀錄介面 */
         <div className="max-w-7xl mx-auto space-y-4">
           {activeModeName && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 text-blue-500 rounded-full w-fit mx-auto mb-4 border border-blue-500/20">
+            <div className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 text-blue-500 rounded-full w-fit mx-auto mb-4 border border-blue-500/20 shadow-sm">
               <Star size={14} className="fill-blue-500" />
-              <span className="text-xs font-black uppercase tracking-tighter">目前模式：{activeModeName}</span>
+              <span className="text-xs font-black tracking-widest">目前模式：{activeModeName}</span>
             </div>
           )}
 
@@ -225,8 +224,8 @@ export default function App() {
                       <select value={p.death} onChange={e=>{const n=[...players];n[pIdx].death=e.target.value;setPlayers(n)}} className={`p-2 rounded-xl text-xs font-black outline-none ${themeClasses.input} ${p.death!=='存活'?'text-rose-500':'text-emerald-500'} appearance-none text-center`}>
                         {DEATH_METHODS.map(m=><option key={m} value={m}>{m}</option>)}
                       </select>
-                      <button onClick={()=>setActivePicker({type:'side',pIdx,rIdx:0})} className={`p-2 rounded-xl text-[10px] font-black ${themeClasses.input} uppercase tracking-tighter`}>
-                        Side: {p.side || '-'}
+                      <button onClick={()=>setActivePicker({type:'side',pIdx,rIdx:0})} className={`p-2 rounded-xl text-[10px] font-black ${themeClasses.input} tracking-tighter`}>
+                        站邊: {p.side || '-'}
                       </button>
                     </div>
                   </div>
@@ -235,14 +234,14 @@ export default function App() {
                   <div className="flex-1 space-y-4">
                     {p.rounds.map((round, rIdx) => (
                       <div key={rIdx} className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-3xl bg-gray-500/5 border border-gray-500/10">
-                        <div className="shrink-0 text-xs font-black opacity-20 w-8 italic">R{rIdx + 1}</div>
+                        <div className="shrink-0 text-xs font-black opacity-20 w-8">R{rIdx + 1}</div>
                         
-                        <div className="flex-1 w-full space-y-2">
-                          {/* 好人 */}
+                        <div className="flex-1 w-full grid grid-cols-2 gap-6">
+                          {/* 好人分欄 */}
                           <Droppable droppableId={`p-${pIdx}-round-${rIdx}-good`} direction="horizontal">
                             {(provided) => (
-                              <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-wrap gap-2 min-h-[36px] items-center">
-                                <span className="text-[10px] font-black text-blue-500 mr-2 uppercase tracking-widest italic">Good</span>
+                              <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-wrap gap-2 min-h-[44px] items-center p-2 rounded-2xl bg-blue-500/5 border border-blue-500/10">
+                                <span className="text-[10px] font-black text-blue-500 mr-2 uppercase tracking-widest">好人</span>
                                 {round.good.map((num, i) => (
                                   <Draggable key={`p-${pIdx}-r-${rIdx}-g-${num}`} draggableId={`p-${pIdx}-r-${rIdx}-g-${num}`} index={i}>
                                     {(provided, snap) => (
@@ -259,11 +258,11 @@ export default function App() {
                             )}
                           </Droppable>
 
-                          {/* 狼坑 */}
+                          {/* 狼坑分欄 */}
                           <Droppable droppableId={`p-${pIdx}-round-${rIdx}-wolf`} direction="horizontal">
                             {(provided) => (
-                              <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-wrap gap-2 min-h-[36px] items-center">
-                                <span className="text-[10px] font-black text-rose-500 mr-2 uppercase tracking-widest italic">Wolf</span>
+                              <div {...provided.droppableProps} ref={provided.innerRef} className="flex flex-wrap gap-2 min-h-[44px] items-center p-2 rounded-2xl bg-rose-500/5 border border-rose-500/10">
+                                <span className="text-[10px] font-black text-rose-500 mr-2 uppercase tracking-widest">狼坑</span>
                                 {round.wolf.map((num, i) => (
                                   <Draggable key={`p-${pIdx}-r-${rIdx}-w-${num}`} draggableId={`p-${pIdx}-r-${rIdx}-w-${num}`} index={i}>
                                     {(provided, snap) => (
@@ -306,7 +305,7 @@ export default function App() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in" onClick={()=>setActivePicker(null)}>
           <div className={`${themeClasses.card} p-10 rounded-[3rem] shadow-2xl w-full max-w-sm border ${themeClasses.border}`} onClick={e=>e.stopPropagation()}>
             <div className="flex justify-between items-center mb-8">
-              <h3 className="font-black text-2xl italic tracking-tighter uppercase">{activePicker.type === 'side' ? 'Choose Side' : 'Select Number'}</h3>
+              <h3 className="font-black text-2xl tracking-tighter uppercase">{activePicker.type === 'side' ? '選擇站邊' : '選擇號碼'}</h3>
               <button onClick={()=>setActivePicker(null)} className="p-2 bg-gray-500/10 rounded-full hover:bg-rose-500 hover:text-white transition-all"><X size={24}/></button>
             </div>
             <div className="grid grid-cols-4 gap-4">
@@ -322,12 +321,12 @@ export default function App() {
                 );
               })}
             </div>
-            <button onClick={()=>setActivePicker(null)} className="w-full mt-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-3xl font-black shadow-xl flex items-center justify-center gap-2"><CheckCircle2 size={24}/> CONFIRM</button>
+            <button onClick={()=>setActivePicker(null)} className="w-full mt-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-3xl font-black shadow-xl flex items-center justify-center gap-2 uppercase tracking-widest underline-offset-4">確認選擇</button>
           </div>
         </div>
       )}
 
-      <footer className="mt-16 text-center text-[10px] font-black opacity-20 uppercase tracking-[0.8em] italic">wolf Tracker</footer>
+      <footer className="mt-16 text-center text-[10px] font-black opacity-20 uppercase tracking-[0.8em]">wolf Tracker</footer>
     </div>
   );
 }
