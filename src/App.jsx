@@ -281,7 +281,7 @@ export default function App() {
       )}
       
       <footer className="mt-12 text-center text-xs opacity-30 font-medium">
-        &copy; {new Date().getFullYear()} Werewolf Tracker • 凹嗚
+        &copy; {new Date().getFullYear()} wolf Tracker
       </footer>
     </div>
   );
